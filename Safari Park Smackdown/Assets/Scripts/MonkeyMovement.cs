@@ -23,14 +23,20 @@ public class MonkeyMovement : MonoBehaviour
 
         movement = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        //animator.SetFloat("Horizontal", movement.x);
-        //animator.SetFloat("Vertical", movement.y);
-        //animator.SetFloat("Speed", movement.sqrMagnitude);
-        
         //Jumping
         if (Input.GetKeyDown(KeyCode.W) && !isJumping)
         {
             rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
+        }
+
+
+        //Moving
+        if (!(Input.GetAxisRaw("Horizontal") == 0))
+        {
+            animator.SetBool("Move", true);
+        }
+        else {
+            animator.SetBool("Move", false);
         }
 
         //Blocking
