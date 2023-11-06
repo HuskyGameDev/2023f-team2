@@ -13,9 +13,12 @@ public abstract class PlayerController : MonoBehaviour
     [System.NonSerialized] public Animator animator;
 
     public bool isPlayer1;  //true = player 1, false = player 2
+    public static PlayerController Player1;
+    public static PlayerController Player2;
 
     //Health
     [System.NonSerialized] public float health;
+    [System.NonSerialized] public float maxHealth;  //this MUST be initialized in an override Awake() function of inherited members, see Monkey.cs
 
     //Movement
     public float speed;
@@ -32,22 +35,33 @@ public abstract class PlayerController : MonoBehaviour
     private float performingActionTime = 0;
     private float stunTime = 0;
 
-    private void Awake()
+    //Upgrades
+    public List<GameObject> possibleUpgradeList;
+    [System.NonSerialized] public List<GameObject> currentUpgradeList = new List<GameObject>();
+
+    protected virtual void Awake()
     {
         playerControls = new PlayerControls();
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+
+        if (isPlayer1)
+            Player1 = this;
+        else 
+            Player2 = this;
     }
 
     private void OnEnable()
     {
         playerControls.Enable();
+        health = maxHealth;
     }
 
     private void FixedUpdate()
     {
         SetControlVars();
 
+        //cool the cooldowns
         if(IsPerformingAction())
             performingActionTime -= Time.fixedDeltaTime;
         if(IsStunned())
@@ -82,6 +96,25 @@ public abstract class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "Platform")
         {
             isJumping = true;
+        }
+    }
+
+    public static void CreateUpgradeCards()
+    {
+        for (int i = 1; i <= 3; i++)
+        {
+            int player1CardIndex = Random.Range(0, Player1.possibleUpgradeList.Count);
+            GameObject player1Card = Instantiate(Player1.possibleUpgradeList[player1CardIndex], Vector3.left * 2.5f * i, Quaternion.identity);
+            UpgradeController player1CardController = player1Card.GetComponent<UpgradeController>();
+            player1CardController.self = Player1.possibleUpgradeList[player1CardIndex]; //this lets the upgrade card know which prefab it was created from
+            player1CardController.isForPlayer1 = true;
+
+
+            int player2CardIndex = Random.Range(0, Player2.possibleUpgradeList.Count);
+            GameObject player2Card = Instantiate(Player2.possibleUpgradeList[player2CardIndex], Vector3.right * 2.5f * i, Quaternion.identity);
+            UpgradeController player2CardController = player2Card.GetComponent<UpgradeController>();
+            player2CardController.self = Player2.possibleUpgradeList[player2CardIndex]; //this lets the upgrade card know which prefab it was created from
+            player2CardController.isForPlayer1 = false;
         }
     }
 
@@ -148,11 +181,31 @@ public abstract class PlayerController : MonoBehaviour
     {
         if(health <= 0)
         {
-            GetComponent<SpriteRenderer>().color = Color.red;
-            rb.rotation = 90;
-            animator.enabled = false;
-            this.enabled = false;
+            StartCoroutine(Die());
         }
+    }
+
+    public void ResetPlayer()
+    {
+        health = maxHealth;
+        GetComponent<SpriteRenderer>().color = Color.white;
+        rb.rotation = 0;
+        animator.enabled = true;
+        this.enabled = true;
+        StopCoroutine(Die());
+
+        transform.position =  Vector3.right * (isPlayer1 ? -4 : 4);
+    }
+
+    IEnumerator Die()
+    {
+        GetComponent<SpriteRenderer>().color = Color.red;
+        rb.rotation = 90;
+        rb.velocity = Vector3.zero;
+        animator.enabled = false;
+        this.enabled = false;
+        yield return new WaitForSeconds(2);
+        GameController.EndRound();
     }
 
     public abstract void Attack();

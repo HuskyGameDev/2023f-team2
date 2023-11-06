@@ -6,9 +6,10 @@ public class Monkey : PlayerController
 {
     [SerializeField] private GameObject jabCollider;
 
-    private void Start()
+    protected override void Awake()
     {
-        health = 80;
+        base.Awake();
+        maxHealth = 80;
     }
 
     public override void Attack()
