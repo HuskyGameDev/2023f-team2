@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Platform
+  - Attack
+  - Upgrade
   layers:
   - Default
   - TransparentFX
@@ -47,4 +49,10 @@ TagManager:
     locked: 0
   - name: Player
     uniqueID: 1337387383
+    locked: 0
+  - name: HUD
+    uniqueID: 3406858469
+    locked: 0
+  - name: UI
+    uniqueID: 867665039
     locked: 0
