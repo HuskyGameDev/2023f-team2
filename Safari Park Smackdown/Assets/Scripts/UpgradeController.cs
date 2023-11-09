@@ -39,6 +39,12 @@ public class UpgradeController : MonoBehaviour
             case "JabDmgInc":
                 player.transform.Find("JabCollider").GetComponent<Attack>().damage += 5;
                 break;
+            case "Jump":
+                player.hasJump = true;
+                break;
+            default: 
+                Debug.LogError("Upgrade \"" + upgradeType + "\" not found.");
+                break;
         }
 
         foreach(GameObject card in GameObject.FindGameObjectsWithTag("Upgrade"))

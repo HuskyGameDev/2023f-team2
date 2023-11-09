@@ -28,6 +28,7 @@ public abstract class PlayerController : MonoBehaviour
     [System.NonSerialized] public float horiz;    //value of the horizontal movement controls composite
     [System.NonSerialized] public bool canMove = true;  //whether or not the player is allowed to move
     [System.NonSerialized] public bool canJump = true;  //whether or not the player is allowed to jump, separate from 'isJumping'
+    [System.NonSerialized] public bool hasJump = false;
 
     [System.NonSerialized] public bool action1;
     [System.NonSerialized] public bool action2;
@@ -101,6 +102,8 @@ public abstract class PlayerController : MonoBehaviour
 
     public static void CreateUpgradeCards()
     {
+        int[] used1 = new int[2];
+        int[] used2 = new int[2];
         for (int i = 1; i <= 3; i++)
         {
             int player1CardIndex = Random.Range(0, Player1.possibleUpgradeList.Count);
@@ -140,7 +143,7 @@ public abstract class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        if (jump && !isJumping && canJump)
+        if (jump && !isJumping && canJump && hasJump)
         {
             rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
         }
