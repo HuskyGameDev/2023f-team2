@@ -8,7 +8,7 @@ using UnityEngine;
  */
 public class Attack : MonoBehaviour
 {
-    [SerializeField] private float damage;
+    public float damage;
     [SerializeField] private float hitStun;
 
     public float GetDamage()
