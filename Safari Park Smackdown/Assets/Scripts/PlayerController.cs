@@ -36,6 +36,9 @@ public abstract class PlayerController : MonoBehaviour
     private float performingActionTime = 0;
     private float stunTime = 0;
 
+    [System.NonSerialized] public bool hasBlock = false;    //if the character has unlocked the block ability
+    [System.NonSerialized] public bool isBlocking = false;
+
     //Upgrades
     public List<GameObject> possibleUpgradeList;
     [System.NonSerialized] public List<GameObject> currentUpgradeList = new List<GameObject>();
@@ -85,9 +88,10 @@ public abstract class PlayerController : MonoBehaviour
             Attack receivedAttack = collision.GetComponent<Attack>();
             if (receivedAttack != null)
             {
-                health -= receivedAttack.GetDamage();
+                float dmg = receivedAttack.GetDamage() * (isBlocking ? .5f : 1);
+                health -= dmg;
                 Stun(receivedAttack.GetHitStun());
-                Debug.Log("Player " + (isPlayer1 ? "1" : "2") + " took " + receivedAttack.GetDamage() + " damage (" + health + " health)");
+                Debug.Log("Player " + (isPlayer1 ? "1" : "2") + " took " + dmg + " damage (" + health + " health)");
             }
         }
     }
@@ -174,10 +178,11 @@ public abstract class PlayerController : MonoBehaviour
         return stunTime > 0;
     }
 
-    public bool Stun(float stunTime)
+    public float Stun(float stunTime)
     {
-        this.stunTime = Mathf.Max(this.stunTime, stunTime);
-        return IsStunned();
+        if(!isBlocking)
+            this.stunTime = Mathf.Max(this.stunTime, stunTime);
+        return this.stunTime;
     }
 
     private void CheckIfDead()

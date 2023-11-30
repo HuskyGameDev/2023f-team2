@@ -42,6 +42,9 @@ public class UpgradeController : MonoBehaviour
             case "Jump":
                 player.hasJump = true;
                 break;
+            case "Block":
+                player.hasBlock = true;
+                break;
             default: 
                 Debug.LogError("Upgrade \"" + upgradeType + "\" not found.");
                 break;

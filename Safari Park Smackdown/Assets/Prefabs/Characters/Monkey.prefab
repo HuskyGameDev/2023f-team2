@@ -257,6 +257,7 @@ MonoBehaviour:
   possibleUpgradeList:
   - {fileID: 410810837357342921, guid: 9fbfc7fce15db8f48b8dff39086dc982, type: 3}
   - {fileID: 6979835767877820868, guid: 0a65cfcce4bb7a049aa921106d4cf939, type: 3}
+  - {fileID: 8947697650658530425, guid: a022eb3db27a8ad4384c88c0e352d362, type: 3}
   jabCollider: {fileID: 2846059802997031027}
 --- !u!50 &4280806520279726440
 Rigidbody2D:
