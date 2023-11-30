@@ -43,6 +43,7 @@ public abstract class PlayerController : MonoBehaviour
     public List<GameObject> possibleUpgradeList;
     [System.NonSerialized] public List<GameObject> currentUpgradeList = new List<GameObject>();
 
+
     protected virtual void Awake()
     {
         playerControls = new PlayerControls();
@@ -59,10 +60,14 @@ public abstract class PlayerController : MonoBehaviour
     {
         playerControls.Enable();
         health = maxHealth;
+
+        playerControls.Player1.Pause.Enable();
+        playerControls.Player1.Pause.started += ctx => { if (!GameController.isPaused) { GameController.Pause(); GameController.gc.pauseMenu.SetActive(true); } };
     }
 
     private void FixedUpdate()
     {
+        
         SetControlVars();
 
         //cool the cooldowns

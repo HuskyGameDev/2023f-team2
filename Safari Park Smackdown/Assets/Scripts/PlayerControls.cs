@@ -80,6 +80,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""f439dbf4-331a-4558-95d8-1ddd780130e4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -190,6 +199,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Action3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""809f95ac-64df-401e-aa0e-30c42154dbfd"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -378,6 +398,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player1_Action1 = m_Player1.FindAction("Action1", throwIfNotFound: true);
         m_Player1_Action2 = m_Player1.FindAction("Action2", throwIfNotFound: true);
         m_Player1_Action3 = m_Player1.FindAction("Action3", throwIfNotFound: true);
+        m_Player1_Pause = m_Player1.FindAction("Pause", throwIfNotFound: true);
         // Player2
         m_Player2 = asset.FindActionMap("Player2", throwIfNotFound: true);
         m_Player2_Jump = m_Player2.FindAction("Jump", throwIfNotFound: true);
@@ -453,6 +474,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player1_Action1;
     private readonly InputAction m_Player1_Action2;
     private readonly InputAction m_Player1_Action3;
+    private readonly InputAction m_Player1_Pause;
     public struct Player1Actions
     {
         private @PlayerControls m_Wrapper;
@@ -463,6 +485,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @Action1 => m_Wrapper.m_Player1_Action1;
         public InputAction @Action2 => m_Wrapper.m_Player1_Action2;
         public InputAction @Action3 => m_Wrapper.m_Player1_Action3;
+        public InputAction @Pause => m_Wrapper.m_Player1_Pause;
         public InputActionMap Get() { return m_Wrapper.m_Player1; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -490,6 +513,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Action3.started += instance.OnAction3;
             @Action3.performed += instance.OnAction3;
             @Action3.canceled += instance.OnAction3;
+            @Pause.started += instance.OnPause;
+            @Pause.performed += instance.OnPause;
+            @Pause.canceled += instance.OnPause;
         }
 
         private void UnregisterCallbacks(IPlayer1Actions instance)
@@ -512,6 +538,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @Action3.started -= instance.OnAction3;
             @Action3.performed -= instance.OnAction3;
             @Action3.canceled -= instance.OnAction3;
+            @Pause.started -= instance.OnPause;
+            @Pause.performed -= instance.OnPause;
+            @Pause.canceled -= instance.OnPause;
         }
 
         public void RemoveCallbacks(IPlayer1Actions instance)
@@ -623,6 +652,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnAction1(InputAction.CallbackContext context);
         void OnAction2(InputAction.CallbackContext context);
         void OnAction3(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
     public interface IPlayer2Actions
     {

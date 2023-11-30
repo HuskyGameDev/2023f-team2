@@ -29,7 +29,7 @@ public class HUDController : MonoBehaviour
 
     public void Update()
     {
-        float hpRatio = PlayerController.Player1.health / PlayerController.Player1.maxHealth;
+        float hpRatio = Mathf.Max(0, PlayerController.Player1.health / PlayerController.Player1.maxHealth);
         player1HealthBar.transform.localScale = new Vector3(hpRatio * 7, .75f, 0);
         player1HealthBar.transform.position = new Vector3(-8 + hpRatio * 3.5f, -4.25f, 0);
 
@@ -38,7 +38,7 @@ public class HUDController : MonoBehaviour
         rgb *= .8f;
         player1HealthBar.GetComponentsInChildren<SpriteRenderer>()[1].color = new Color(rgb.x, rgb.y, rgb.z);
 
-        hpRatio = PlayerController.Player2.health / PlayerController.Player2.maxHealth;
+        hpRatio = Mathf.Max(0, PlayerController.Player2.health / PlayerController.Player2.maxHealth);
         player2HealthBar.transform.localScale = new Vector3(hpRatio * 7, .75f, 0);
         player2HealthBar.transform.position = new Vector3(8 - hpRatio * 3.5f, -4.25f, 0);
 

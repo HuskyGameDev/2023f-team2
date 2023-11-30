@@ -1,7 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.ConstrainedExecution;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -14,6 +11,11 @@ public class GameController : MonoBehaviour
 
     public static bool Player1HasChosenUpgrade = false;
     public static bool Player2HasChosenUpgrade = false;
+
+    public static bool isPaused = false;
+    public static bool isBetweenRounds = false;
+
+    public GameObject pauseMenu;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +32,8 @@ public class GameController : MonoBehaviour
 
     public static void StartRound()
     {
-        Unpause();
+        Pause();    //unpause
+        isBetweenRounds = false;
         PlayerController.Player1.ResetPlayer();
         PlayerController.Player2.ResetPlayer();
 
@@ -42,42 +45,53 @@ public class GameController : MonoBehaviour
 
     public static void EndRound()
     {
-        Pause();
-
-        if (PlayerController.Player1.health <= 0)
-            Player2Wins++;
-        else
-            Player1Wins++;
-        HUDController.UpdateWins();
-
-        if (Player1Wins >= RoundLimit || Player2Wins >= RoundLimit)
-            EndGame();
-        else
+        if (!isPaused && !isBetweenRounds)
         {
-            PlayerController.CreateUpgradeCards();
+            isBetweenRounds = true;
+            Pause();
+
+            if (PlayerController.Player1.health <= 0)
+                Player2Wins++;
+            else
+                Player1Wins++;
+            HUDController.UpdateWins();
+
+            if (Player1Wins >= RoundLimit || Player2Wins >= RoundLimit)
+                WinGame();
+            else
+            {
+                PlayerController.CreateUpgradeCards();
+            }
         }
     }
 
     public static void Pause() 
     {
-        Time.timeScale = 0;
-        gc.transform.GetChild(0).gameObject.SetActive(true);
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0 : 1;
+        gc.transform.GetChild(0).gameObject.SetActive(isPaused);
+        if(!isPaused )
+        {
+            gc.pauseMenu.SetActive(false);
+        }
+        Debug.Log("Game is now " + (isPaused ? "Paused" : "Unpaused"));
     }
 
-    public static void Unpause()
+    public static void WinGame()
     {
-        Time.timeScale = 1;
-        gc.transform.GetChild(0).gameObject.SetActive(false);
+        gc.StartCoroutine(gc.WaitForWin());
     }
 
     public static void EndGame()
     {
-        gc.StartCoroutine(gc.GoToMain());
+        Time.timeScale = 1;
+        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
     }
 
-    IEnumerator GoToMain()
+    IEnumerator WaitForWin()
     {
-        yield return new WaitForSeconds(1);
-        SceneManager.LoadScene("Main Menu", LoadSceneMode.Single);
+        
+        yield return new WaitForSecondsRealtime(2);
+        EndGame();
     }
 }
