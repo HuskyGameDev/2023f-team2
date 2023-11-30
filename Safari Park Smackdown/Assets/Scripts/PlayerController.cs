@@ -28,6 +28,7 @@ public abstract class PlayerController : MonoBehaviour
     [System.NonSerialized] public float horiz;    //value of the horizontal movement controls composite
     [System.NonSerialized] public bool canMove = true;  //whether or not the player is allowed to move
     [System.NonSerialized] public bool canJump = true;  //whether or not the player is allowed to jump, separate from 'isJumping'
+    [System.NonSerialized] public bool hasJump = false;
 
     [System.NonSerialized] public bool action1;
     [System.NonSerialized] public bool action2;
@@ -35,9 +36,13 @@ public abstract class PlayerController : MonoBehaviour
     private float performingActionTime = 0;
     private float stunTime = 0;
 
+    [System.NonSerialized] public bool hasBlock = false;    //if the character has unlocked the block ability
+    [System.NonSerialized] public bool isBlocking = false;
+
     //Upgrades
     public List<GameObject> possibleUpgradeList;
     [System.NonSerialized] public List<GameObject> currentUpgradeList = new List<GameObject>();
+
 
     protected virtual void Awake()
     {
@@ -55,10 +60,14 @@ public abstract class PlayerController : MonoBehaviour
     {
         playerControls.Enable();
         health = maxHealth;
+
+        playerControls.Player1.Pause.Enable();
+        playerControls.Player1.Pause.started += ctx => { if (!GameController.isPaused) { GameController.Pause(); GameController.gc.pauseMenu.SetActive(true); } };
     }
 
     private void FixedUpdate()
     {
+        
         SetControlVars();
 
         //cool the cooldowns
@@ -84,9 +93,10 @@ public abstract class PlayerController : MonoBehaviour
             Attack receivedAttack = collision.GetComponent<Attack>();
             if (receivedAttack != null)
             {
-                health -= receivedAttack.GetDamage();
+                float dmg = receivedAttack.GetDamage() * (isBlocking ? .5f : 1);
+                health -= dmg;
                 Stun(receivedAttack.GetHitStun());
-                Debug.Log("Player " + (isPlayer1 ? "1" : "2") + " took " + receivedAttack.GetDamage() + " damage (" + health + " health)");
+                Debug.Log("Player " + (isPlayer1 ? "1" : "2") + " took " + dmg + " damage (" + health + " health)");
             }
         }
     }
@@ -101,6 +111,8 @@ public abstract class PlayerController : MonoBehaviour
 
     public static void CreateUpgradeCards()
     {
+        int[] used1 = new int[2];
+        int[] used2 = new int[2];
         for (int i = 1; i <= 3; i++)
         {
             int player1CardIndex = Random.Range(0, Player1.possibleUpgradeList.Count);
@@ -140,7 +152,7 @@ public abstract class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        if (jump && !isJumping && canJump)
+        if (jump && !isJumping && canJump && hasJump)
         {
             rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
         }
@@ -171,10 +183,11 @@ public abstract class PlayerController : MonoBehaviour
         return stunTime > 0;
     }
 
-    public bool Stun(float stunTime)
+    public float Stun(float stunTime)
     {
-        this.stunTime = Mathf.Max(this.stunTime, stunTime);
-        return IsStunned();
+        if(!isBlocking)
+            this.stunTime = Mathf.Max(this.stunTime, stunTime);
+        return this.stunTime;
     }
 
     private void CheckIfDead()

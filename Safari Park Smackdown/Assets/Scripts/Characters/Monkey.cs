@@ -6,6 +6,7 @@ public class Monkey : PlayerController
 {
     [SerializeField] private GameObject jabCollider;
 
+
     protected override void Awake()
     {
         base.Awake();
@@ -24,7 +25,7 @@ public class Monkey : PlayerController
             {
                 Jab();
             }
-            if (action2 && !isJumping)
+            if (action2 && !isJumping && hasBlock)
             {
                 Block();
             }
@@ -50,6 +51,9 @@ public class Monkey : PlayerController
 
         canJump = false;
         canMove = false;
+
+        isBlocking = true;
+
         StartPerformingAction(.25f);
     }
 
@@ -59,5 +63,7 @@ public class Monkey : PlayerController
 
         animator.SetBool("Jab", false);
         animator.SetBool("Block", false);
+
+        isBlocking = false;
     }
 }
